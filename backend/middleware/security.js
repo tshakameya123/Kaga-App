@@ -85,11 +85,19 @@ const xssSanitize = (obj) => {
 };
 
 export const xssClean = (req, res, next) => {
-    if (req.body) req.body = xssSanitize(req.body);
-    if (req.query) req.query = xssSanitize(req.query);
-    if (req.params) req.params = xssSanitize(req.params);
-    next();
+  if (req.body) req.body = xssSanitize(req.body);
+  if (req.query) {
+    // sanitize each query parameter individually
+    for (const key in req.query) {
+      if (Object.hasOwnProperty.call(req.query, key)) {
+        req.query[key] = xssSanitize(req.query[key]);
+      }
+    }
+  }
+  if (req.params) req.params = xssSanitize(req.params);
+  next();
 };
+
 
 /**
  * MongoDB Sanitization

@@ -9,7 +9,7 @@ ARG VITE_BACKEND_URL=http://localhost:4000
 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 
 # Copy package files
-COPY package*.json ./
+COPY admin/package*.json ./
 
 # Install all dependencies (including devDependencies for build)
 RUN npm ci

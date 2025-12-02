@@ -163,6 +163,13 @@ app.use(cors(corsOptions));
 // Apply global rate limiting
 app.use(globalLimiter);
 
+// sanitize request data to prevent XSS and NoSQL injection
+app.use(
+  mongoSanitize({
+    replaceWith: '_', // avoids setting read-only req.query
+  })
+);
+
 // Sanitize all incoming requests
 app.use(sanitizeRequest);
 

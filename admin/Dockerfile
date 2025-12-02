@@ -26,7 +26,7 @@ FROM node:20-alpine AS production
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY admin/package*.json ./
 
 # Install only production dependencies
 RUN npm ci --only=production
@@ -35,7 +35,7 @@ RUN npm ci --only=production
 COPY --from=builder /app/dist ./dist
 
 # Copy server file
-COPY server.js ./
+COPY admin/server.js ./
 
 # Expose port
 EXPOSE 3001

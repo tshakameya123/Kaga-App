@@ -211,7 +211,7 @@ export const applySecurityMiddleware = (app) => {
     app.use(xssClean);
     
     // NoSQL injection protection
-    app.use(mongoSanitization);
+    app.use(mongoSanitizeInPlace);;
     
     // HPP protection
     app.use(hppProtection);

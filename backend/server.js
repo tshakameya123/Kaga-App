@@ -14,6 +14,7 @@ import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { rescheduleAppointment } from './controllers/userController.js';
 import weatherRoutes from './routes/weather.js';
+import mongoSanitize from 'express-mongo-sanitize';
 
 // Security middleware imports
 import { applySecurityMiddleware, requestSizeLimiter } from './middleware/security.js';

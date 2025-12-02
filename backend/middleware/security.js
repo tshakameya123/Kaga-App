@@ -85,16 +85,23 @@ const xssSanitize = (obj) => {
 };
 
 export const xssClean = (req, res, next) => {
-  if (req.body) req.body = xssSanitize(req.body);
-  if (req.query) {
-    // sanitize each query parameter individually
-    for (const key in req.query) {
-      if (Object.hasOwnProperty.call(req.query, key)) {
-        req.query[key] = xssSanitize(req.query[key]);
+  const sanitizeObject = (obj) => {
+    for (const key in obj) {
+      if (Object.hasOwnProperty.call(obj, key)) {
+        const value = obj[key];
+        if (typeof value === "string") {
+          obj[key] = xssSanitize(value); // sanitize strings
+        } else if (typeof value === "object" && value !== null) {
+          sanitizeObject(value); // recursively sanitize nested objects
+        }
       }
     }
-  }
-  if (req.params) req.params = xssSanitize(req.params);
+  };
+
+  if (req.body) sanitizeObject(req.body);
+  if (req.query) sanitizeObject(req.query);
+  if (req.params) sanitizeObject(req.params);
+
   next();
 };
 

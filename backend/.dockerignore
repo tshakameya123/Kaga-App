@@ -1,0 +1,36 @@
+# Dependencies
+node_modules
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Test files
+coverage
+tests
+*.test.js
+*.spec.js
+
+# Scripts (not needed in production)
+scripts
+
+# IDE
+.idea
+.vscode
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker files
+Dockerfile*
+.dockerignore
+
+# Documentation
+*.md

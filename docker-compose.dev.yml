@@ -1,0 +1,95 @@
+version: '3.8'
+
+# Development docker-compose with hot reloading
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: kh-app-mongodb-dev
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME:-kh_app}
+    volumes:
+      - mongodb_data_dev:/data/db
+      - ./docker/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - kh-app-network-dev
+
+  # Backend API with hot reload
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: kh-app-backend-dev
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      - PORT=4000
+      - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-password123}@mongodb:27017/${MONGO_DB_NAME:-kh_app}?authSource=admin
+      - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_key_here}
+      - CLOUDINARY_NAME=${CLOUDINARY_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_SECRET_KEY=${CLOUDINARY_SECRET_KEY}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - mongodb
+    networks:
+      - kh-app-network-dev
+
+  # Frontend with hot reload
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: kh-app-frontend-dev
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - VITE_BACKEND_URL=http://localhost:4000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - kh-app-network-dev
+
+  # Admin/Doctor Dashboard with hot reload
+  admin-doc:
+    build:
+      context: ./admin-doc
+      dockerfile: Dockerfile.dev
+    container_name: kh-app-admin-dev
+    restart: unless-stopped
+    ports:
+      - "5174:5174"
+    environment:
+      - NODE_ENV=development
+      - VITE_BACKEND_URL=http://localhost:4000
+    volumes:
+      - ./admin-doc:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - kh-app-network-dev
+
+networks:
+  kh-app-network-dev:
+    driver: bridge
+
+volumes:
+  mongodb_data_dev:
+    driver: local
